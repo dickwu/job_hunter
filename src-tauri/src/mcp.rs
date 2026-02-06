@@ -19,9 +19,14 @@ pub fn start(app: AppHandle, db: Db) -> Result<u16, String> {
         .local_addr()
         .map_err(|err| format!("mcp local addr: {err}"))?
         .port();
-    let listener = TcpListener::from_std(listener).map_err(|err| format!("mcp listener: {err}"))?;
-
     tauri::async_runtime::spawn(async move {
+        let listener = match TcpListener::from_std(listener) {
+            Ok(listener) => listener,
+            Err(err) => {
+                log::error!("mcp listener: {err}");
+                return;
+            }
+        };
         loop {
             let (stream, _) = match listener.accept().await {
                 Ok(value) => value,
