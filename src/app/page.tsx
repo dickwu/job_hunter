@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { invoke, isTauri } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
@@ -52,6 +52,14 @@ const parseList = (value: string) =>
 const listToText = (value: string[]) => value.join("\n");
 
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="p-10 text-sm">Loading...</div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [jobUrl, setJobUrl] = useState("");
